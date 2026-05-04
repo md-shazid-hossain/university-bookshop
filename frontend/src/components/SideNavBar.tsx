@@ -5,7 +5,6 @@ import {
   FaBook,
   FaPencilAlt,
   FaSearch,
-
   FaCrown,
   FaBars,
   FaCalculator,
@@ -14,11 +13,11 @@ import { NavLink } from "react-router";
 
 const menuItems = [
   { icon: FaHome, label: "Home", path: "/dashboard/home" },
-  { icon: FaBook, label: "Books",  path: "books" },
-  { icon: FaPencilAlt, label: "Stationary", path: "/dashboard/products" },
-  { icon: FaSearch, label: "Lost & Found", path: "/dashboard/settings" },
-  { icon: FaCalculator, label: "Calculator", path: "/dashboard/calculator" },
-  { icon: FaCrown, label: "Subscriptions", path: "/dashboard/settings" },
+  { icon: FaBook, label: "Books", path: "books" },
+  { icon: FaPencilAlt, label: "Stationary", path: "stationary" },
+  { icon: FaCalculator, label: "Calculator", path: "calculator" },
+  { icon: FaSearch, label: "Lost & Found", path: "lost-found" },
+  { icon: FaCrown, label: "Subscriptions", path: "subscriptions" },
 ];
 
 const SideNavBar = () => {

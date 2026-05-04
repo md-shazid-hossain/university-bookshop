@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Calculator from "./pages/Calculator";
 import NotFound from "./pages/NotFound";
 import BooksPage from "./pages/BooksPage";
+import StationaryPage from "./pages/StationaryPage";
 
 // Main Layout Component
 function Layout() {
@@ -45,6 +46,7 @@ const router = createBrowserRouter([
           { path: "home", element: <Home /> },
           { path: "calculator", element: <Calculator /> },
           { path: "books", element: <BooksPage /> },
+          { path: "stationary", element: <StationaryPage /> },
         ],
       },
       {
@@ -57,6 +59,7 @@ const router = createBrowserRouter([
         children: [
           { path: "sell-item-form", element: <SellItemForm /> },
           { path: "books", element: <BooksPage /> },
+          { path: "stationary", element: <StationaryPage /> },
         ],
       },
     ],

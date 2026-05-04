@@ -9,12 +9,28 @@ const StationaryPage = () => {
 
   const items: Item[] = [
     {
+      id: 4,
+      title: "Class Notes (CSE)",
+      price: "120 tk",
+      rating: 4.2,
+      image:
+        "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?w=600",
+    },
+    {
       id: 1,
       title: "Physics Textbook",
       price: "200 tk",
       rating: 4.5,
       image:
         "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=600",
+    },
+    {
+      id: 4,
+      title: "Class Notes (CSE)",
+      price: "120 tk",
+      rating: 4.2,
+      image:
+        "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?w=600",
     },
     {
       id: 2,
@@ -32,20 +48,14 @@ const StationaryPage = () => {
       image:
         "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=600",
     },
-    {
-      id: 4,
-      title: "Class Notes (CSE)",
-      price: "120 tk",
-      rating: 4.2,
-      image:
-        "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?w=600",
-    },
   ];
 
   return (
     <div className="max-w-8xl mx-auto px-4 mt-10">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-3xl font-semibold text-gray-800">Books</h2>
+        <h2 className="text-3xl font-semibold text-gray-800">
+          Stationary Items
+        </h2>
       </div>
 
       {/* Grid */}

@@ -16,6 +16,15 @@ const BooksPage = () => {
       image:
         "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=600",
     },
+
+    {
+      id: 4,
+      title: "Class Notes (CSE)",
+      price: "120 tk",
+      rating: 4.2,
+      image:
+        "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?w=600",
+    },
     {
       id: 2,
       title: "Notebook Set (5 Pcs)",
@@ -32,6 +41,7 @@ const BooksPage = () => {
       image:
         "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=600",
     },
+
     {
       id: 4,
       title: "Class Notes (CSE)",
@@ -40,13 +50,20 @@ const BooksPage = () => {
       image:
         "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?w=600",
     },
+    {
+      id: 2,
+      title: "Notebook Set (5 Pcs)",
+      price: "300 tk",
+      rating: 4.0,
+      image:
+        "https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=600",
+    },  
   ];
 
   return (
     <div className="max-w-8xl mx-auto px-4 mt-10">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-3xl font-semibold text-gray-800">Books</h2>
-        
       </div>
 
       {/* Grid */}
