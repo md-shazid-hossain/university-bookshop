@@ -11,7 +11,7 @@ import {
 const navItems = [
   { to: "/dashboard/home", icon: FaHome, label: "Home" },
   { to: "/sellpage/sell-item-form", icon: FaPlusCircle, label: "Sell" },
-  { to: "/subscriptions", icon: FaCrown, label: "Subscriptions" },
+  { to: "/dashboard/subscriptions", icon: FaCrown, label: "Subscriptions" },
 ];
 
 const MainNavbar = () => {
@@ -36,21 +36,21 @@ const MainNavbar = () => {
       </div>
 
       {/* Logo */}
-<div className="flex-1">
-  <NavLink to="/dashboard/home" className="block">
-    <div className="flex items-center gap-2">
-      {/* Logo icon - using emoji or you can use an SVG */}
-      <div className="bg-blue-600 text-white w-9 h-9 rounded-xl flex items-center justify-center text-xl font-bold shadow-sm">
-        CM
+      <div className="flex-1">
+        <NavLink to="/dashboard/home" className="block">
+          <div className="flex items-center gap-2">
+            {/* Logo icon - using emoji or you can use an SVG */}
+            <div className="bg-blue-600 text-white w-9 h-9 rounded-xl flex items-center justify-center text-xl font-bold shadow-sm">
+              CM
+            </div>
+            {/* Text logo */}
+            <div className="text-2xl font-bold tracking-tight">
+              <span className="text-blue-600">Campus</span>
+              <span className="text-gray-800">Market</span>
+            </div>
+          </div>
+        </NavLink>
       </div>
-      {/* Text logo */}
-      <div className="text-2xl font-bold tracking-tight">
-        <span className="text-blue-600">Campus</span>
-        <span className="text-gray-800">Market</span>
-      </div>
-    </div>
-  </NavLink>
-</div>
 
       {/* Desktop Navigation */}
       <nav className="hidden lg:flex gap-1">
