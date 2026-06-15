@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"; // 1. Import hooks
 import axios from "axios"; // 2. Import axios
 import { Link } from "react-router";
 
-const AllStationaryPage = () => {
+const AllItems = () => {
   // Adjusted Type definitions to match your backend Item schema
   type Item = {
     id: number;
@@ -17,8 +17,9 @@ const AllStationaryPage = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  console.log(items);
 
-  const stationary = items.filter((item) => item.category === "Stationary");
+
 
   // 3. Fetch data inside useEffect on component mount
   useEffect(() => {
@@ -65,21 +66,22 @@ const AllStationaryPage = () => {
       </div>
     );
   }
-
   return (
     <div className="max-w-8xl mx-auto px-4 mt-10">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-3xl font-semibold text-gray-800">All Stationaries To Be Sold</h2>
+        <h2 className="text-3xl font-semibold text-gray-800">
+          All Items
+        </h2>
       </div>
 
       {/* Grid handling empty state */}
-      {stationary.length === 0 ? (
+      {items.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
           No items available right now.
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {stationary.map((item) => (
+          {items.map((item) => (
             <div
               key={item.id}
               className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition flex flex-col justify-between"
@@ -126,4 +128,4 @@ const AllStationaryPage = () => {
   );
 };
 
-export default AllStationaryPage;
+export default AllItems;

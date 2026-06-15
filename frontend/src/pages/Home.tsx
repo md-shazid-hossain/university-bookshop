@@ -1,73 +1,74 @@
-import React from "react";
-
-type Item = {
-  id: number;
-  title: string;
-  price: string;
-  rating: number;
-  image: string;
-};
-
-type Subscription = {
-  id: number;
-  title: string;
-  members: string;
-  price: string;
-};
-
-const items: Item[] = [
-  {
-    id: 1,
-    title: "Physics Textbook",
-    price: "200 tk",
-    rating: 4.5,
-    image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=600",
-  },
-  {
-    id: 2,
-    title: "Notebook Set (5 Pcs)",
-    price: "300 tk",
-    rating: 4.0,
-    image: "https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=600",
-  },
-  {
-    id: 3,
-    title: "Casio fx-991ES Plus",
-    price: "250 tk",
-    rating: 4.5,
-    image: "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=600",
-  },
-  {
-    id: 4,
-    title: "Class Notes (CSE)",
-    price: "120 tk",
-    rating: 4.2,
-    image: "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?w=600",
-  },
-];
-
-const subscriptions: Subscription[] = [
-  {
-    id: 1,
-    title: "Netflix Group",
-    members: "2/4",
-    price: "200 tk per user",
-  },
-  {
-    id: 2,
-    title: "Canva Pro Group",
-    members: "2/4",
-    price: "100 tk per user",
-  },
-  {
-    id: 3,
-    title: "Spotify Premium",
-    members: "3/5",
-    price: "80 tk per user",
-  },
-];
+import { useState, useEffect } from "react"; // 1. Import hooks
+import axios from "axios"; // 2. Import axios
+import { Link } from "react-router";
 
 const Home: React.FC = () => {
+  // Adjusted Type definitions to match your backend Item schema
+  type Item = {
+    id: number;
+    title: string;
+    price: number | string; // Keeps flexibility depending on how decimal maps
+    condition: string;
+    description: string;
+    imageUrl: string; // Matched database column name
+    category: string;
+  };
+
+  const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  console.log(items);
+
+
+
+  const allitems = items.slice(0, 4);
+
+  // 3. Fetch data inside useEffect on component mount
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        setLoading(true);
+        // Replace with your production URL if necessary
+        const response = await axios.get("http://localhost:3000/items");
+
+        // Filter for "Books" category if you want this page to only show books
+        const allItems: Item[] = response.data;
+
+        setItems(allItems);
+        setError(null);
+      } catch (err: any) {
+        console.error("Error fetching items:", err);
+        setError("Failed to load products. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItems();
+  }, []);
+
+  // Handle Loading State
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="text-xl font-medium text-gray-600 animate-pulse">
+          Loading items...
+        </div>
+      </div>
+    );
+  }
+
+  // Handle Error State
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="text-red-500 font-medium bg-red-50 px-4 py-2 rounded-lg border border-red-200">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -83,9 +84,9 @@ const Home: React.FC = () => {
               Buy, sell and share books, stationery and subscriptions.
             </p>
 
-            <button className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+            {/* <button className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
               Explore Now
-            </button>
+            </button> */}
           </div>
 
           {/* Right Image */}
@@ -103,82 +104,65 @@ const Home: React.FC = () => {
       <div className="max-w-8xl mx-auto px-4 mt-10">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-800">Popular Items</h2>
-          <button className="text-indigo-600 hover:underline">View all</button>
+          <button className="text-indigo-600 hover:underline"><Link to='/dashboard/all-items'>View All</Link></button>
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition"
-            >
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-full h-32 object-contain mb-3"
-              />
-
-              <h3 className="font-medium text-gray-800">{item.title}</h3>
-
-              <div className="flex justify-between items-center mt-2 text-sm">
-                <span className="text-gray-600">{item.price}</span>
-                <span className="text-yellow-500 font-medium">
-                  ⭐ {item.rating}
-                </span>
-              </div>
-
-              <button className="mt-3 w-full py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200">
-                View Details
-              </button>
+        <div>
+          {/* Grid handling empty state */}
+          {allitems.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              No items available right now.
             </div>
-          ))}
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {allitems.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition flex flex-col justify-between"
+                >
+                  <div>
+                    <img
+                      src="https://i.ibb.co.com/chmc3g62/428639.jpg" // Updated to use imageUrl
+                      alt={item.title}
+                      className="w-full h-32 object-contain mb-3 bg-gray-50 rounded-lg"
+                      onError={(e) => {
+                        // Fallback placeholder image if a broken URL is fed from DB
+                        (e.target as HTMLImageElement).src =
+                          "https://placehold.co/600x400?text=No+Image";
+                      }}
+                    />
+
+                    <h3 className="font-medium text-gray-800 line-clamp-2">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-1 uppercase tracking-wider bg-gray-100 w-max px-2 py-0.5 rounded">
+                      {item.condition}
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between items-center mt-4 text-sm">
+                      <span className="text-blue-600 font-semibold">
+                        {item.price} tk
+                      </span>
+                    </div>
+
+                    <Link
+                      to={String(item.id)}
+                      className="mt-3 w-full py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium"
+                    >
+                      View Details
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Subscription Groups Section */}
-      <div className="max-w-8xl mx-auto px-4 mt-12 mb-10">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-800">
-            Subscription Groups
-          </h2>
-          <button className="text-indigo-600 hover:underline">View all</button>
-        </div>
-
-        {/* Subscription Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {subscriptions.map((sub) => (
-            <div
-              key={sub.id}
-              className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition border border-gray-100"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-semibold text-lg text-gray-800">
-                    {sub.title}
-                  </h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Members: {sub.members}
-                  </p>
-                </div>
-                <div className="bg-indigo-50 px-3 py-1 rounded-full">
-                  <span className="text-indigo-600 font-medium text-sm">
-                    Available
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-2xl font-bold text-gray-800 mt-4">
-                {sub.price}
-              </p>
-
-              <button className="mt-4 w-full py-2.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                Join Group
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios"; // 1. Import axios
+import { useNavigate } from "react-router";
 
 interface FormData {
   title: string;
@@ -18,6 +19,7 @@ interface FormErrors {
 }
 
 const SellItemForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     title: "",
     category: "",
@@ -101,6 +103,12 @@ const SellItemForm = () => {
       console.log("Response from server:", response.data);
       alert("Item posted successfully!");
 
+      if (formData.category === "Books") {
+        navigate("/sellpage/books");
+      } else if (formData.category === "Stationary") {
+        navigate("/sellpage/stationary");
+      }
+
       // Reset form after successful submission
       setFormData({
         title: "",
@@ -153,6 +161,7 @@ const SellItemForm = () => {
                       Image URL
                     </label>
                     <input
+                      required
                       type="url"
                       name="imageUrl"
                       value={formData.imageUrl}
@@ -221,6 +230,7 @@ const SellItemForm = () => {
                     Title
                   </label>
                   <input
+                    required
                     type="text"
                     name="title"
                     value={formData.title}
@@ -241,6 +251,7 @@ const SellItemForm = () => {
                       Category
                     </label>
                     <select
+                      required
                       name="category"
                       value={formData.category}
                       onChange={handleChange}
@@ -265,6 +276,7 @@ const SellItemForm = () => {
                       Price (tk)
                     </label>
                     <input
+                      required
                       type="number"
                       name="price"
                       value={formData.price}
@@ -287,6 +299,7 @@ const SellItemForm = () => {
                     Condition
                   </label>
                   <select
+                    required
                     name="condition"
                     value={formData.condition}
                     onChange={handleChange}
@@ -313,6 +326,7 @@ const SellItemForm = () => {
                     Description
                   </label>
                   <textarea
+                    required
                     name="description"
                     value={formData.description}
                     onChange={handleChange}

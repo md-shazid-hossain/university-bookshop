@@ -1,39 +1,44 @@
-import { useState, useEffect } from "react"; // 1. Import hooks
-import axios from "axios"; // 2. Import axios
-import { Link } from "react-router";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router";
 
 const StationaryPage = () => {
-  // Adjusted Type definitions to match your backend Item schema
+  const navigate = useNavigate();
   type Item = {
     id: number;
     title: string;
-    price: number | string; // Keeps flexibility depending on how decimal maps
+    price: number | string;
     condition: string;
     description: string;
-    imageUrl: string; // Matched database column name
+    imageUrl: string;
     category: string;
+
+    userId?: number;
   };
 
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const stationary = items.filter((item) => item.category === "Stationary");
+  const fromLocalStorage = localStorage.getItem("user");
+  const user = fromLocalStorage ? JSON.parse(fromLocalStorage) : null;
 
-  // 3. Fetch data inside useEffect on component mount
+  console.log(user?.id);
+
+  const stationary = items.filter(
+    (item) => item.category === "Stationary" && item.userId === user?.id,
+  );
+
   useEffect(() => {
     const fetchItems = async () => {
       try {
         setLoading(true);
-        // Replace with your production URL if necessary
+
         const response = await axios.get("http://localhost:3000/items");
 
-        // Filter for "Books" category if you want this page to only show books
-        const allItems: Item[] = response.data;
-
-        setItems(allItems);
+        setItems(response.data);
         setError(null);
-      } catch (err: any) {
+      } catch (err) {
         console.error("Error fetching items:", err);
         setError("Failed to load products. Please try again later.");
       } finally {
@@ -44,7 +49,27 @@ const StationaryPage = () => {
     fetchItems();
   }, []);
 
-  // Handle Loading State
+  // DELETE API FUNCTION
+  const handleDelete = async (id: number) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this item?",
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:3000/items/${id}`);
+
+      // instantly update UI
+      setItems((prev) => prev.filter((item) => item.id !== id));
+
+      alert("Item deleted successfully");
+    } catch (err) {
+      console.error("Delete failed:", err);
+      alert("Failed to delete item");
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -55,7 +80,6 @@ const StationaryPage = () => {
     );
   }
 
-  // Handle Error State
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -72,7 +96,6 @@ const StationaryPage = () => {
         <h2 className="text-3xl font-semibold text-gray-800">My Stationary</h2>
       </div>
 
-      {/* Grid handling empty state */}
       {stationary.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
           No items available right now.
@@ -86,11 +109,12 @@ const StationaryPage = () => {
             >
               <div>
                 <img
-                  src="https://i.ibb.co.com/chmc3g62/428639.jpg" // Updated to use imageUrl
+                  src={
+                    item.imageUrl || "https://i.ibb.co.com/chmc3g62/428639.jpg"
+                  }
                   alt={item.title}
                   className="w-full h-32 object-contain mb-3 bg-gray-50 rounded-lg"
                   onError={(e) => {
-                    // Fallback placeholder image if a broken URL is fed from DB
                     (e.target as HTMLImageElement).src =
                       "https://placehold.co/600x400?text=No+Image";
                   }}
@@ -99,6 +123,7 @@ const StationaryPage = () => {
                 <h3 className="font-medium text-gray-800 line-clamp-2">
                   {item.title}
                 </h3>
+
                 <p className="text-xs text-gray-400 mt-1 uppercase tracking-wider bg-gray-100 w-max px-2 py-0.5 rounded">
                   {item.condition}
                 </p>
@@ -111,12 +136,29 @@ const StationaryPage = () => {
                   </span>
                 </div>
 
-                <Link
-                  to={String(item.id)}
-                  className="mt-3 w-full py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium"
-                >
-                  View Details
-                </Link>
+                <div className="mt-3 flex gap-2">
+                  <Link
+                    to={String(item.id)}
+                    className="flex-1 py-2 text-center text-sm bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium"
+                  >
+                    View Details
+                  </Link>
+
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate(`/sellpage/update/${item.id}`);
+                    }}
+                    className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                  >
+                    Edit
+                  </button>
+                </div>
               </div>
             </div>
           ))}

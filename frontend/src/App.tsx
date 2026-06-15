@@ -12,6 +12,10 @@ import StationaryPage from "./pages/StationaryPage";
 import Subscription from "./pages/Subscription";
 import ProductDetail from "./pages/ProductDetail"; // 1. Imported your ProductDetail page
 import Login from "./pages/Login";
+import AllBooksPage from "./pages/AllBooksPage";
+import AllStationaryPage from "./pages/AllStationaryPage";
+import AllItems from "./pages/AllItems";
+import UpdateItemForm from "./pages/UpdateItemForm";
 
 // Main Layout Component
 function Layout() {
@@ -36,7 +40,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <div className="p-6"><Login/></div>,
+        element: (
+          <div className="p-6">
+            <Login />
+          </div>
+        ),
       },
       // 2. Added product details route globally under the main Navbar layout
 
@@ -48,10 +56,11 @@ const router = createBrowserRouter([
           </SidebarLayout>
         ),
         children: [
-          { path: "stationary", element: <StationaryPage /> },
+          { path: "stationary", element: <AllStationaryPage /> },
           { path: "home", element: <Home /> },
+          { path: "all-items", element: <AllItems /> },
           { path: "calculator", element: <Calculator /> },
-          { path: "books", element: <BooksPage /> },
+          { path: "books", element: <AllBooksPage /> },
           { path: "subscriptions", element: <Subscription /> },
         ],
       },
@@ -71,6 +80,7 @@ const router = createBrowserRouter([
           },
           { path: "stationary", element: <StationaryPage /> },
           { path: "subscriptions", element: <Subscription /> },
+          { path: "/sellpage/update/:id", element: <UpdateItemForm /> },
         ],
       },
     ],

@@ -19,11 +19,11 @@ const MainNavbar = () => {
 
   const handleLogout = () => {
     // Clear any authentication tokens/storage
-    localStorage.removeItem("token"); // or sessionStorage.clear()
+    localStorage.clear(); // or sessionStorage.clear()
     // Or if using context/redux, dispatch logout action here
 
     // Redirect to login page
-    navigate("/login");
+    navigate("/");
   };
 
   return (

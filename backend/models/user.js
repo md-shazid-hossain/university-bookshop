@@ -1,24 +1,26 @@
-// After defining both models, add the associations
-
-// User model (add this to user.js)
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("./index");
 
 const User = sequelize.define("User", {
   user_id: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   password: {
     type: DataTypes.STRING,
+    allowNull: true,
   },
 });
 
-// Define association
-User.associate = function(models) {
+User.associate = function (models) {
   User.hasMany(models.Item, {
-    foreignKey: 'userId',
-    as: 'items' // alias for easy access
+    foreignKey: "userId",
+    as: "items",
+  });
+
+  User.hasMany(models.Subscription, {
+    foreignKey: "userId",
+    as: "subscriptions",
   });
 };
 
