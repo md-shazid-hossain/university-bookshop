@@ -1,4 +1,5 @@
-import { useState, DragEvent, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
+import axios from "axios"; // 1. Import axios
 
 interface FormData {
   title: string;
@@ -8,11 +9,8 @@ interface FormData {
   description: string;
   contactOption: "chat-only" | "show-phone";
   phoneNumber: string;
-}
-
-interface ImagePreview {
-  file: File;
-  preview: string;
+  imageUrl: string;
+  userId: number;
 }
 
 interface FormErrors {
@@ -28,76 +26,33 @@ const SellItemForm = () => {
     description: "",
     contactOption: "chat-only",
     phoneNumber: "",
+    imageUrl: "",
+    userId: 0,
   });
 
-  const [images, setImages] = useState<ImagePreview[]>([]);
-  const [dragActive, setDragActive] = useState<boolean>(false);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const fromLocalStorage = localStorage.getItem("user");
 
-  const categories: string[] = [
-    "Electronics",
-    "Furniture",
-    "Clothing",
-    "Books",
-    "Vehicles",
-    "Real Estate",
-    "Sports",
-    "Other",
-  ];
+  const user = fromLocalStorage ? JSON.parse(fromLocalStorage) : null;
+
+  // console.log(user);
+  console.log(user?.id);
+
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // Track loading state
+
+  const categories: string[] = ["Books", "Stationary"];
 
   const conditions: string[] = ["New", "Like New", "Good", "Fair", "Used"];
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value, userId: user?.id });
 
-    if (type === "radio") {
-      setFormData({ ...formData, [name]: value });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-
-    // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors({ ...errors, [name]: "" });
     }
-  };
-
-  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const newImages: ImagePreview[] = files.map((file) => ({
-      file,
-      preview: URL.createObjectURL(file),
-    }));
-    setImages((prev) => [...prev, ...newImages]);
-  };
-
-  const handleDrag = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    const files = Array.from(e.dataTransfer.files);
-    const newImages: ImagePreview[] = files.map((file) => ({
-      file,
-      preview: URL.createObjectURL(file),
-    }));
-    setImages((prev) => [...prev, ...newImages]);
-  };
-
-  const removeImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const validateForm = (): boolean => {
@@ -118,16 +73,54 @@ const SellItemForm = () => {
     ) {
       newErrors.phoneNumber = "Phone number is required";
     }
+    if (!formData.imageUrl.trim()) {
+      newErrors.imageUrl = "Image URL is required";
+    } else if (!formData.imageUrl.startsWith("http")) {
+      newErrors.imageUrl =
+        "Please enter a valid URL starting with http or https";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  // 2. Updated handleSubmit to handle the async API call
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (validateForm()) {
-      // Handle form submission
-      console.log("Form submitted:", { ...formData, images });
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      // Replace with your actual backend URL if different (e.g., http://localhost:3000/items)
+      const response = await axios.post(
+        "http://localhost:3000/items",
+        formData,
+      );
+
+      console.log("Response from server:", response.data);
       alert("Item posted successfully!");
+
+      // Reset form after successful submission
+      setFormData({
+        title: "",
+        category: "",
+        price: "",
+        condition: "",
+        description: "",
+        contactOption: "chat-only",
+        phoneNumber: "",
+        imageUrl: "",
+        userId: 0,
+      });
+    } catch (err: any) {
+      console.error("Submission error:", err);
+      alert(
+        err.response?.data?.error ||
+          "Something went wrong while posting the item.",
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -147,95 +140,77 @@ const SellItemForm = () => {
         {/* Form Card */}
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-2xl overflow-hidden"
+          className="bg-white rounded-2xl overflow-hidden shadow-sm"
         >
           <div className="p-6 md:p-8">
             {/* Two Column Layout */}
             <div className="flex flex-col lg:flex-row gap-8">
-              {/* Left Column - Image Uploader */}
-              <div className="lg:w-1/2">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Upload Images
-                </label>
-                <div
-                  className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-colors cursor-pointer h-full min-h-[400px] flex flex-col justify-center
-                ${dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"}
-                ${images.length > 0 ? "bg-gray-50" : "bg-white"}`}
-                  onDragEnter={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDragOver={handleDrag}
-                  onDrop={handleDrop}
-                  onClick={() =>
-                    document.getElementById("image-input")?.click()
-                  }
-                >
-                  <input
-                    id="image-input"
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageUpload}
-                  />
-                  <div className="space-y-2">
-                    <svg
-                      className="mx-auto h-12 w-12 text-gray-400"
-                      stroke="currentColor"
-                      fill="none"
-                      viewBox="0 0 48 48"
-                    >
-                      <path
-                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <div className="text-sm text-gray-600">
-                      <span className="font-semibold text-blue-600">
-                        Click to upload
-                      </span>{" "}
-                      or drag and drop
-                    </div>
-                    <p className="text-xs text-gray-500">
-                      PNG, JPG, GIF up to 10MB
-                    </p>
+              {/* Left Column - Image URL Input & Live Preview */}
+              <div className="lg:w-1/2 flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Image URL
+                    </label>
+                    <input
+                      type="url"
+                      name="imageUrl"
+                      value={formData.imageUrl}
+                      onChange={handleChange}
+                      placeholder="Paste image link here (e.g., https://example.com/image.jpg)"
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition
+                    ${errors.imageUrl ? "border-red-500" : "border-gray-300"}`}
+                    />
+                    {errors.imageUrl && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {errors.imageUrl}
+                      </p>
+                    )}
                   </div>
-                </div>
 
-                {/* Image Preview */}
-                {images.length > 0 && (
-                  <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {images.map((img, idx) => (
-                      <div key={idx} className="relative group">
+                  {/* Dynamic Image Preview Box */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Image Preview
+                    </label>
+                    <div className="border-2 border-gray-200 rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center min-h-[300px] max-h-[400px]">
+                      {formData.imageUrl && !errors.imageUrl ? (
                         <img
-                          src={img.preview}
-                          alt={`Preview ${idx}`}
-                          className="w-full h-24 object-cover rounded-lg shadow"
+                          src={formData.imageUrl}
+                          alt="Product preview"
+                          className="w-full h-full object-contain max-h-[400px]"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "";
+                            setErrors((prev) => ({
+                              ...prev,
+                              imageUrl:
+                                "Invalid image link or URL is not accessible.",
+                            }));
+                          }}
                         />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(idx)}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition"
-                        >
+                      ) : (
+                        <div className="text-center p-6 text-gray-400">
                           <svg
-                            className="w-4 h-4"
-                            fill="none"
+                            className="mx-auto h-12 w-12 mb-2"
                             stroke="currentColor"
-                            viewBox="0 0 24 24"
+                            fill="none"
+                            viewBox="0 0 48 48"
                           >
                             <path
+                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                              strokeWidth="2"
                               strokeLinecap="round"
                               strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
                             />
                           </svg>
-                        </button>
-                      </div>
-                    ))}
+                          <span className="text-sm">
+                            Provide a valid image URL to see preview
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Right Column - Form Fields */}
@@ -402,9 +377,11 @@ const SellItemForm = () => {
                 <div className="pt-4">
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg"
+                    disabled={isSubmitting} // Disable button during API call
+                    className={`w-full text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg
+                    ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"}`}
                   >
-                    Post Item
+                    {isSubmitting ? "Posting..." : "Post Item"}
                   </button>
                 </div>
               </div>

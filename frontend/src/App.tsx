@@ -10,6 +10,8 @@ import NotFound from "./pages/NotFound";
 import BooksPage from "./pages/BooksPage";
 import StationaryPage from "./pages/StationaryPage";
 import Subscription from "./pages/Subscription";
+import ProductDetail from "./pages/ProductDetail"; // 1. Imported your ProductDetail page
+import Login from "./pages/Login";
 
 // Main Layout Component
 function Layout() {
@@ -34,8 +36,10 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <div className="p-6">Home Page</div>,
+        element: <div className="p-6"><Login/></div>,
       },
+      // 2. Added product details route globally under the main Navbar layout
+
       {
         path: "dashboard",
         element: (
@@ -61,6 +65,10 @@ const router = createBrowserRouter([
         children: [
           { path: "sell-item-form", element: <SellItemForm /> },
           { path: "books", element: <BooksPage /> },
+          {
+            path: "books/:id",
+            element: <ProductDetail />,
+          },
           { path: "stationary", element: <StationaryPage /> },
           { path: "subscriptions", element: <Subscription /> },
         ],
@@ -69,7 +77,7 @@ const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <NotFound />, // You can replace this with a NotFound component
+    element: <NotFound />,
   },
 ]);
 

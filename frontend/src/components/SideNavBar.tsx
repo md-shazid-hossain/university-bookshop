@@ -16,7 +16,6 @@ const menuItems = [
   { icon: FaBook, label: "Books", path: "books" },
   { icon: FaPencilAlt, label: "Stationary", path: "stationary" },
   { icon: FaCalculator, label: "Calculator", path: "calculator" },
-  { icon: FaSearch, label: "Lost & Found", path: "lost-found" },
   { icon: FaCrown, label: "Subscriptions", path: "subscriptions" },
 ];
 

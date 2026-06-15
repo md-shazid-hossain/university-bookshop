@@ -14,7 +14,6 @@ const sellMenuItems = [
   { icon: FaTag, label: "Sell New Item", path: "sell-item-form" },
   { icon: FaBook, label: "Books", path: "books" },
   { icon: FaPencilAlt, label: "Stationary", path: "stationary" },
-  { icon: FaSearch, label: "Lost & Found", path: "lost-found" },
   { icon: FaCrown, label: "Subscription", path: "subscriptions" },
 ];
 
