@@ -47,9 +47,7 @@ const Subscription = sequelize.define(
       allowNull: false,
     },
 
-    socialMediaGroupUrl: {
-      type: DataTypes.STRING,
-    },
+
   },
   {
     timestamps: true,

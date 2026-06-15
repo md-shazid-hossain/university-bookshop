@@ -7,24 +7,26 @@ type Subscription = {
   maximum_member: number;
   price: number;
   imageUrl: string;
+  gender: string;
+  phoneNumber?: string;
+  socialMediagroulUrl?: string;
 };
 
 export default function SubscriptionGroups() {
   const [tab, setTab] = useState<"join" | "create">("join");
   const [groups, setGroups] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
-  // form state
   const [form, setForm] = useState({
     name: "",
     maximum_member: "",
     price: "",
     imageUrl: "",
+    gender: "",
+    phoneNumber: "",
   });
 
-  const [editingId, setEditingId] = useState<number | null>(null);
-
-  // 📥 GET ALL
   const fetchGroups = async () => {
     setLoading(true);
     try {
@@ -39,20 +41,30 @@ export default function SubscriptionGroups() {
     fetchGroups();
   }, []);
 
+  const resetForm = () => {
+    setForm({
+      name: "",
+      maximum_member: "",
+      price: "",
+      imageUrl: "",
+      gender: "",
+      phoneNumber: "",
+    });
+  };
+
   // ➕ CREATE
   const createGroup = async () => {
     await api.post("/subscriptions", {
       ...form,
       maximum_member: Number(form.maximum_member),
       price: Number(form.price),
-      gender: "all",
       userId: 1,
       imageUrl:
         form.imageUrl ||
         "https://cdn-icons-png.flaticon.com/512/1828/1828884.png",
     });
 
-    setForm({ name: "", maximum_member: "", price: "", imageUrl: "" });
+    resetForm();
     fetchGroups();
     setTab("join");
   };
@@ -63,7 +75,7 @@ export default function SubscriptionGroups() {
     fetchGroups();
   };
 
-  // ✏️ EDIT START
+  // ✏️ EDIT
   const startEdit = (g: Subscription) => {
     setEditingId(g.id);
     setForm({
@@ -71,6 +83,8 @@ export default function SubscriptionGroups() {
       maximum_member: String(g.maximum_member),
       price: String(g.price),
       imageUrl: g.imageUrl,
+      gender: g.gender || "",
+      phoneNumber: g.phoneNumber || "",
     });
     setTab("create");
   };
@@ -86,13 +100,14 @@ export default function SubscriptionGroups() {
     });
 
     setEditingId(null);
-    setForm({ name: "", maximum_member: "", price: "", imageUrl: "" });
+    resetForm();
     fetchGroups();
     setTab("join");
   };
 
   return (
     <div className="min-h-screen bg-base-200 p-6">
+
       {/* Tabs */}
       <div className="flex justify-center mb-6">
         <div className="tabs tabs-boxed bg-base-100 shadow">
@@ -111,7 +126,7 @@ export default function SubscriptionGroups() {
         </div>
       </div>
 
-      {/* JOIN VIEW */}
+      {/* LIST */}
       {tab === "join" && (
         <>
           {loading ? (
@@ -119,25 +134,22 @@ export default function SubscriptionGroups() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {groups.map((group) => (
-                <div
-                  key={group.id}
-                  className="card bg-base-100 shadow-md hover:shadow-xl transition"
-                >
-                  <div className="card-body items-center text-center">
+                <div key={group.id} className="card bg-base-100 shadow-md">
+                  <div className="card-body text-center items-center">
                     <img
                       src={group.imageUrl}
                       className="w-14 h-14 rounded-full"
                     />
 
-                    <h3 className="card-title">{group.name}</h3>
+                    <h2 className="card-title">{group.name}</h2>
 
-                    <p className="text-sm opacity-70">
-                      Max: {group.maximum_member}
-                    </p>
+                    <p>Gender: {group.gender}</p>
+                    <p>Max: {group.maximum_member}</p>
+                    <p className="text-green-600 font-bold">৳ {group.price}</p>
 
-                    <p className="font-semibold text-green-600">
-                      ৳ {group.price}
-                    </p>
+                    {group.phoneNumber && (
+                      <p className="text-sm">📞 {group.phoneNumber}</p>
+                    )}
 
                     <div className="flex gap-2 mt-3">
                       <button
@@ -169,59 +181,49 @@ export default function SubscriptionGroups() {
         </>
       )}
 
-      {/* CREATE / UPDATE VIEW */}
+      {/* FORM */}
       {tab === "create" && (
         <div className="flex justify-center">
           <div className="card bg-base-100 shadow w-full max-w-md">
             <div className="card-body space-y-3">
-              <h2 className="text-lg font-bold">
-                {editingId ? "Update Group" : "Create Group"}
-              </h2>
 
-              <input
-                className="input input-bordered"
-                placeholder="Service name"
+              <input className="input input-bordered" placeholder="Name"
                 value={form.name}
-                onChange={(e) =>
-                  setForm({ ...form, name: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
 
-              <input
-                className="input input-bordered"
-                placeholder="Max members"
+              <input className="input input-bordered" placeholder="Max Members"
                 value={form.maximum_member}
-                onChange={(e) =>
-                  setForm({ ...form, maximum_member: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, maximum_member: e.target.value })}
               />
 
-              <input
-                className="input input-bordered"
-                placeholder="Price"
+              <input className="input input-bordered" placeholder="Price"
                 value={form.price}
-                onChange={(e) =>
-                  setForm({ ...form, price: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, price: e.target.value })}
               />
 
-              <input
-                className="input input-bordered"
-                placeholder="Image URL"
+              <input className="input input-bordered" placeholder="Gender"
+                value={form.gender}
+                onChange={(e) => setForm({ ...form, gender: e.target.value })}
+              />
+
+              <input className="input input-bordered" placeholder="Phone Number"
+                value={form.phoneNumber}
+                onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+              />
+
+              <input className="input input-bordered" placeholder="Image URL"
                 value={form.imageUrl}
-                onChange={(e) =>
-                  setForm({ ...form, imageUrl: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
               />
 
               <button
-                className={`btn ${
-                  editingId ? "btn-warning" : "btn-success"
-                }`}
+                className={`btn ${editingId ? "btn-warning" : "btn-success"}`}
                 onClick={editingId ? updateGroup : createGroup}
               >
                 {editingId ? "Update" : "Create"}
               </button>
+
             </div>
           </div>
         </div>
