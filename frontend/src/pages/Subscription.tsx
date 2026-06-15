@@ -32,6 +32,8 @@ export default function SubscriptionGroups() {
     try {
       const res = await api.get("/subscriptions");
       setGroups(res.data);
+    } catch (error) {
+      console.error("Failed to fetch groups", error);
     } finally {
       setLoading(false);
     }
@@ -50,6 +52,7 @@ export default function SubscriptionGroups() {
       gender: "",
       phoneNumber: "",
     });
+    setEditingId(null);
   };
 
   // ➕ CREATE
@@ -71,6 +74,7 @@ export default function SubscriptionGroups() {
 
   // 🗑 DELETE
   const deleteGroup = async (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this group?")) return;
     await api.delete(`/subscriptions/${id}`);
     fetchGroups();
   };
@@ -99,26 +103,27 @@ export default function SubscriptionGroups() {
       price: Number(form.price),
     });
 
-    setEditingId(null);
     resetForm();
     fetchGroups();
     setTab("join");
   };
 
   return (
-    <div className="min-h-screen bg-base-200 p-6">
-
+    <div className="min-h-screen bg-base-200 p-4 md:p-8">
       {/* Tabs */}
-      <div className="flex justify-center mb-6">
-        <div className="tabs tabs-boxed bg-base-100 shadow">
+      <div className="flex justify-center mb-8">
+        <div className="tabs tabs-boxed bg-base-100 shadow-sm">
           <button
-            className={`tab ${tab === "join" ? "tab-active" : ""}`}
-            onClick={() => setTab("join")}
+            className={`tab px-8 ${tab === "join" ? "tab-active font-bold" : ""}`}
+            onClick={() => {
+              setTab("join");
+              resetForm();
+            }}
           >
             Join Group
           </button>
           <button
-            className={`tab ${tab === "create" ? "tab-active" : ""}`}
+            className={`tab px-8 ${tab === "create" ? "tab-active font-bold" : ""}`}
             onClick={() => setTab("create")}
           >
             {editingId ? "Update Group" : "Create Group"}
@@ -126,51 +131,77 @@ export default function SubscriptionGroups() {
         </div>
       </div>
 
-      {/* LIST */}
+      {/* LIST TAB */}
       {tab === "join" && (
         <>
           {loading ? (
-            <p className="text-center">Loading...</p>
+            <div className="flex justify-center mt-10">
+              <span className="loading loading-spinner loading-lg text-primary"></span>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {groups.map((group) => (
-                <div key={group.id} className="card bg-base-100 shadow-md">
-                  <div className="card-body text-center items-center">
-                    <img
-                      src={group.imageUrl}
-                      className="w-14 h-14 rounded-full"
-                    />
+                <div
+                  key={group.id}
+                  className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-200"
+                >
+                  <div className="card-body p-6">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="avatar">
+                        <div className="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                          <img src={group.imageUrl} alt={group.name} />
+                        </div>
+                      </div>
+                      <div>
+                        <h2 className="card-title text-lg font-bold">
+                          {group.name}
+                        </h2>
+                        <div className="flex gap-2 mt-1">
+                          <div className="badge badge-outline text-xs">
+                            {group.gender}
+                          </div>
+                          <div className="badge badge-ghost text-xs">
+                            Max: {group.maximum_member}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-                    <h2 className="card-title">{group.name}</h2>
+                    <div className="space-y-2 mb-4">
+                      <p className="flex justify-between items-center text-sm">
+                        <span className="text-base-content/70">Price</span>
+                        <span className="text-success font-bold text-lg">
+                          ৳ {group.price}
+                        </span>
+                      </p>
+                      {group.phoneNumber && (
+                        <p className="flex justify-between items-center text-sm">
+                          <span className="text-base-content/70">Contact</span>
+                          <span className="font-medium">
+                            📞 {group.phoneNumber}
+                          </span>
+                        </p>
+                      )}
+                    </div>
 
-                    <p>Gender: {group.gender}</p>
-                    <p>Max: {group.maximum_member}</p>
-                    <p className="text-green-600 font-bold">৳ {group.price}</p>
-
-                    {group.phoneNumber && (
-                      <p className="text-sm">📞 {group.phoneNumber}</p>
-                    )}
-
-                    <div className="flex gap-2 mt-3">
+                    <div className="card-actions justify-end mt-auto pt-4 border-t border-base-200">
                       <button
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-primary btn-sm flex-1"
                         onClick={() => alert("Joined!")}
                       >
                         Join
                       </button>
-
                       <button
                         className="btn btn-warning btn-sm"
                         onClick={() => startEdit(group)}
                       >
                         Edit
                       </button>
-
                       <button
-                        className="btn btn-error btn-sm"
+                        className="btn btn-error btn-sm btn-square"
                         onClick={() => deleteGroup(group.id)}
                       >
-                        Delete
+                        ✕
                       </button>
                     </div>
                   </div>
@@ -181,49 +212,155 @@ export default function SubscriptionGroups() {
         </>
       )}
 
-      {/* FORM */}
+      {/* FORM TAB */}
       {tab === "create" && (
         <div className="flex justify-center">
-          <div className="card bg-base-100 shadow w-full max-w-md">
-            <div className="card-body space-y-3">
+          <div className="card bg-base-100 shadow-xl w-full max-w-2xl">
+            <div className="card-body">
+              <h2 className="card-title text-2xl mb-6 justify-center">
+                {editingId ? "Update Subscription Group" : "Create New Group"}
+              </h2>
 
-              <input className="input input-bordered" placeholder="Name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-              />
+              {/* Image Preview */}
+              <div className="flex flex-col items-center mb-6">
+                <div className="avatar mb-2">
+                  <div className="w-24 h-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2 bg-base-200">
+                    <img
+                      src={
+                        form.imageUrl ||
+                        "https://cdn-icons-png.flaticon.com/512/1828/1828884.png"
+                      }
+                      alt="Preview"
+                      className="object-cover"
+                      onError={(e) =>
+                        (e.currentTarget.src =
+                          "https://cdn-icons-png.flaticon.com/512/1828/1828884.png")
+                      }
+                    />
+                  </div>
+                </div>
+                <span className="text-xs text-base-content/50">
+                  Image Preview
+                </span>
+              </div>
 
-              <input className="input input-bordered" placeholder="Max Members"
-                value={form.maximum_member}
-                onChange={(e) => setForm({ ...form, maximum_member: e.target.value })}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label className="form-control w-full">
+                  <div className="label">
+                    <span className="label-text font-medium">Group Name</span>
+                  </div>
+                  <input
+                    type="text"
+                    className="input input-bordered w-full"
+                    placeholder="Netflix Premium"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  />
+                </label>
 
-              <input className="input input-bordered" placeholder="Price"
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: e.target.value })}
-              />
+                <label className="form-control w-full">
+                  <div className="label">
+                    <span className="label-text font-medium">Price (৳)</span>
+                  </div>
+                  <input
+                    type="number"
+                    className="input input-bordered w-full"
+                    placeholder="150"
+                    value={form.price}
+                    onChange={(e) =>
+                      setForm({ ...form, price: e.target.value })
+                    }
+                  />
+                </label>
 
-              <input className="input input-bordered" placeholder="Gender"
-                value={form.gender}
-                onChange={(e) => setForm({ ...form, gender: e.target.value })}
-              />
+                <label className="form-control w-full">
+                  <div className="label">
+                    <span className="label-text font-medium">Max Members</span>
+                  </div>
+                  <input
+                    type="number"
+                    className="input input-bordered w-full"
+                    placeholder="4"
+                    value={form.maximum_member}
+                    onChange={(e) =>
+                      setForm({ ...form, maximum_member: e.target.value })
+                    }
+                  />
+                </label>
 
-              <input className="input input-bordered" placeholder="Phone Number"
-                value={form.phoneNumber}
-                onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
-              />
+                <label className="form-control w-full">
+                  <div className="label">
+                    <span className="label-text font-medium">
+                      Gender Requirement
+                    </span>
+                  </div>
+                  <select
+                    className="select select-bordered w-full"
+                    value={form.gender}
+                    onChange={(e) =>
+                      setForm({ ...form, gender: e.target.value })
+                    }
+                  >
+                    <option value="" disabled>
+                      Select Gender
+                    </option>
+                    <option value="Any">Any</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </label>
 
-              <input className="input input-bordered" placeholder="Image URL"
-                value={form.imageUrl}
-                onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-              />
+                <label className="form-control w-full">
+                  <div className="label">
+                    <span className="label-text font-medium">Phone Number</span>
+                  </div>
+                  <input
+                    type="tel"
+                    className="input input-bordered w-full"
+                    placeholder="+880 1..."
+                    value={form.phoneNumber}
+                    onChange={(e) =>
+                      setForm({ ...form, phoneNumber: e.target.value })
+                    }
+                  />
+                </label>
 
-              <button
-                className={`btn ${editingId ? "btn-warning" : "btn-success"}`}
-                onClick={editingId ? updateGroup : createGroup}
-              >
-                {editingId ? "Update" : "Create"}
-              </button>
+                <label className="form-control w-full">
+                  <div className="label">
+                    <span className="label-text font-medium">Image URL</span>
+                  </div>
+                  <input
+                    type="url"
+                    className="input input-bordered w-full"
+                    placeholder="https://..."
+                    value={form.imageUrl}
+                    onChange={(e) =>
+                      setForm({ ...form, imageUrl: e.target.value })
+                    }
+                  />
+                </label>
+              </div>
 
+              <div className="card-actions justify-end mt-8">
+                {editingId && (
+                  <button
+                    className="btn btn-ghost"
+                    onClick={() => {
+                      resetForm();
+                      setTab("join");
+                    }}
+                  >
+                    Cancel
+                  </button>
+                )}
+                <button
+                  className={`btn ${editingId ? "btn-warning" : "btn-primary"} min-w-[120px]`}
+                  onClick={editingId ? updateGroup : createGroup}
+                  disabled={!form.name || !form.price || !form.maximum_member}
+                >
+                  {editingId ? "Save Changes" : "Create Group"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
