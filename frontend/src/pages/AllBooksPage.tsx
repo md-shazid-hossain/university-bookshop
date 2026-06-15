@@ -1,48 +1,44 @@
-import { useState, useEffect } from "react"; // 1. Import hooks
-import axios from "axios"; // 2. Import axios
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Link } from "react-router";
 
+type Item = {
+  id: number;
+  title: string;
+  price: number | string;
+  condition: string;
+  description: string;
+  imageUrl: string;
+  category: string;
+};
+
 const AllBooksPage = () => {
-  // Adjusted Type definitions to match your backend Item schema
-  type Item = {
-    id: number;
-    title: string;
-    price: number | string; // Keeps flexibility depending on how decimal maps
-    condition: string;
-    description: string;
-    imageUrl: string; // Matched database column name
-    category: string;
-  };
-
   const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [books, setBooks] = useState<Item[]>([]);
+  const [search, setSearch] = useState("");
+
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  console.log(items);
 
-  const fromLocalStorage = localStorage.getItem("user");
-
-  const user = fromLocalStorage ? JSON.parse(fromLocalStorage) : null;
-
-  const books = items.filter(
-    (item) => item.category === "Books",
-  );
-
-  // 3. Fetch data inside useEffect on component mount
   useEffect(() => {
     const fetchItems = async () => {
       try {
         setLoading(true);
-        // Replace with your production URL if necessary
-        const response = await axios.get("http://localhost:3000/items");
 
-        // Filter for "Books" category if you want this page to only show books
-        const allItems: Item[] = response.data;
+        const { data } = await axios.get(
+          "http://localhost:3000/items"
+        );
 
-        setItems(allItems);
+        const bookItems = data.filter(
+          (item: Item) => item.category === "Books"
+        );
+
+        setItems(bookItems);
+        setBooks(bookItems);
         setError(null);
-      } catch (err: any) {
-        console.error("Error fetching items:", err);
-        setError("Failed to load products. Please try again later.");
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load books.");
       } finally {
         setLoading(false);
       }
@@ -51,22 +47,30 @@ const AllBooksPage = () => {
     fetchItems();
   }, []);
 
-  // Handle Loading State
+  useEffect(() => {
+    const filtered = items.filter((book) =>
+      book.title
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    );
+
+    setBooks(filtered);
+  }, [search, items]);
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="text-xl font-medium text-gray-600 animate-pulse">
-          Loading items...
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="text-lg font-medium text-gray-500 animate-pulse">
+          Loading books...
         </div>
       </div>
     );
   }
 
-  // Handle Error State
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="text-red-500 font-medium bg-red-50 px-4 py-2 rounded-lg border border-red-200">
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl">
           {error}
         </div>
       </div>
@@ -74,53 +78,110 @@ const AllBooksPage = () => {
   }
 
   return (
-    <div className="max-w-8xl mx-auto px-4 mt-10">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-3xl font-semibold text-gray-800">All Books To Be Sold</h2>
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">
+          📚 Book Marketplace
+        </h1>
+
+        <p className="text-gray-500 mt-1">
+          Discover books shared by students
+        </p>
       </div>
 
-      {/* Grid handling empty state */}
+      {/* Stats + Search */}
+      <div className="grid md:grid-cols-[220px_1fr] gap-4 mb-8">
+        <div className="bg-white border rounded-xl p-5 shadow-sm">
+          <p className="text-sm text-gray-500">
+            Available Books
+          </p>
+
+          <h2 className="text-3xl font-bold mt-1">
+            {books.length}
+          </h2>
+        </div>
+
+        <div className="bg-white border rounded-xl p-4 shadow-sm">
+          <input
+            type="text"
+            placeholder="Search books..."
+            value={search}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
+            className="w-full border rounded-lg px-4 py-3 outline-none"
+          />
+        </div>
+      </div>
+
+      {/* Empty State */}
       {books.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
-          No items available right now.
+        <div className="bg-white border rounded-2xl py-20 text-center">
+          <div className="text-6xl mb-4">📚</div>
+
+          <h2 className="text-2xl font-semibold">
+            No books found
+          </h2>
+
+          <p className="text-gray-500 mt-2">
+            Try another search term.
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {books.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition flex flex-col justify-between"
+              className="bg-white border rounded-2xl overflow-hidden hover:shadow-lg transition duration-300"
             >
-              <div>
+              {/* Image */}
+              <div className="relative">
                 <img
-                  src="https://i.ibb.co.com/chmc3g62/428639.jpg" // Updated to use imageUrl
+                  src={
+                    item.imageUrl ||
+                    "https://placehold.co/600x400?text=Book"
+                  }
                   alt={item.title}
-                  className="w-full h-32 object-contain mb-3 bg-gray-50 rounded-lg"
+                  className="w-full h-52 object-cover"
                   onError={(e) => {
-                    // Fallback placeholder image if a broken URL is fed from DB
-                    (e.target as HTMLImageElement).src =
+                    (
+                      e.target as HTMLImageElement
+                    ).src =
                       "https://placehold.co/600x400?text=No+Image";
                   }}
                 />
 
-                <h3 className="font-medium text-gray-800 line-clamp-2">
-                  {item.title}
-                </h3>
-                <p className="text-xs text-gray-400 mt-1 uppercase tracking-wider bg-gray-100 w-max px-2 py-0.5 rounded">
-                  {item.condition}
-                </p>
+                <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full shadow font-bold text-blue-600">
+                  ৳ {item.price}
+                </div>
               </div>
 
-              <div>
-                <div className="flex justify-between items-center mt-4 text-sm">
-                  <span className="text-blue-600 font-semibold">
-                    {item.price} tk
+              {/* Content */}
+              <div className="p-4">
+                <h3 className="font-semibold text-lg text-gray-800 line-clamp-2 min-h-[56px]">
+                  {item.title}
+                </h3>
+
+                <div className="mt-2">
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full font-medium ${
+                      item.condition === "New"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {item.condition}
                   </span>
                 </div>
 
+                <p className="text-sm text-gray-500 mt-3 line-clamp-3 min-h-[60px]">
+                  {item.description}
+                </p>
+
                 <Link
-                  to={String(item.id)}
-                  className="mt-3 w-full py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium"
+                  to={`${item.id}`}
+                  className="block mt-5 text-center py-2 border rounded-lg hover:bg-gray-50 transition"
                 >
                   View Details
                 </Link>

@@ -1,48 +1,43 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router";
 
+type Item = {
+  id: number;
+  title: string;
+  price: number | string;
+  condition: string;
+  description: string;
+  imageUrl: string;
+  category: string;
+  userId?: number;
+};
+
 const BooksPage = () => {
   const navigate = useNavigate();
-  type Item = {
-    id: number;
-    title: string;
-    price: number | string;
-    condition: string;
-    description: string;
-    imageUrl: string;
-    category: string;
-
-    // Add this if your backend stores item owner
-    userId?: number;
-  };
 
   const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
-  const fromLocalStorage = localStorage.getItem("user");
-  const user = fromLocalStorage ? JSON.parse(fromLocalStorage) : null;
-
-  // Change this filter according to your database structure
-  const books = items.filter(
-    (item) =>
-      item.category === "Books" &&
-      (item.userId === user?.id || item.id === user?.id),
-  );
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
         setLoading(true);
 
-        const response = await axios.get("http://localhost:3000/items");
+        const { data } = await axios.get(
+          "http://localhost:3000/items",
+        );
 
-        setItems(response.data);
+        setItems(data);
         setError(null);
       } catch (err) {
-        console.error("Error fetching items:", err);
-        setError("Failed to load products. Please try again later.");
+        console.error(err);
+        setError("Failed to load books.");
       } finally {
         setLoading(false);
       }
@@ -52,30 +47,43 @@ const BooksPage = () => {
   }, []);
 
   const handleDelete = async (id: number) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this item?",
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this book?"
     );
 
-    if (!confirmDelete) return;
+    if (!confirmed) return;
 
     try {
-      await axios.delete(`http://localhost:3000/items/${id}`);
+      await axios.delete(
+        `http://localhost:3000/items/${id}`
+      );
 
-      // Update UI instantly
-      setItems((prevItems) => prevItems.filter((item) => item.id !== id));
-
-      alert("Item deleted successfully");
+      setItems((prev) =>
+        prev.filter((item) => item.id !== id)
+      );
     } catch (err) {
-      console.error("Delete failed:", err);
-      alert("Failed to delete item");
+      console.error(err);
+      alert("Failed to delete item.");
     }
   };
 
+  const books = items
+    .filter(
+      (item) =>
+        item.category === "Books" &&
+        item.userId === user?.id
+    )
+    .filter((item) =>
+      item.title
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    );
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="text-xl font-medium text-gray-600 animate-pulse">
-          Loading items...
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="text-lg font-medium text-gray-500 animate-pulse">
+          Loading books...
         </div>
       </div>
     );
@@ -83,8 +91,8 @@ const BooksPage = () => {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="text-red-500 font-medium bg-red-50 px-4 py-2 rounded-lg border border-red-200">
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl">
           {error}
         </div>
       </div>
@@ -92,72 +100,148 @@ const BooksPage = () => {
   }
 
   return (
-    <div className="max-w-8xl mx-auto px-4 mt-10">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-3xl font-semibold text-gray-800">Your Books</h2>
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            My Books
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Manage your listed books
+          </p>
+        </div>
+
+        <button
+          onClick={() => navigate("/sellpage/sell-item-form")}
+          className="bg-blue-600 text-white px-5 py-3 rounded-xl hover:bg-blue-700 transition"
+        >
+          + Add Book
+        </button>
       </div>
 
+      {/* Stats + Search */}
+      <div className="grid md:grid-cols-[220px_1fr] gap-4 mb-8">
+        <div className="bg-white border rounded-xl p-5 shadow-sm">
+          <p className="text-sm text-gray-500">
+            Total Listings
+          </p>
+          <h2 className="text-3xl font-bold mt-1">
+            {books.length}
+          </h2>
+        </div>
+
+        <div className="bg-white border rounded-xl p-4 shadow-sm">
+          <input
+            type="text"
+            placeholder="Search your books..."
+            value={search}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
+            className="w-full outline-none border rounded-lg px-4 py-3"
+          />
+        </div>
+      </div>
+
+      {/* Empty State */}
       {books.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
-          No items available right now.
+        <div className="bg-white border rounded-2xl py-20 text-center">
+          <div className="text-6xl mb-4">📚</div>
+
+          <h2 className="text-2xl font-semibold">
+            No books found
+          </h2>
+
+          <p className="text-gray-500 mt-2">
+            Start selling your books today.
+          </p>
+
+          <button
+            onClick={() => navigate("/sellpage")}
+            className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700"
+          >
+            Add Your First Book
+          </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {books.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition flex flex-col justify-between"
+              className="bg-white border rounded-2xl overflow-hidden hover:shadow-lg transition duration-300"
             >
-              <div>
+              {/* Image */}
+              <div className="relative">
                 <img
                   src={
-                    item.imageUrl || "https://i.ibb.co.com/chmc3g62/428639.jpg"
+                    item.imageUrl ||
+                    "https://placehold.co/600x400?text=Book"
                   }
                   alt={item.title}
-                  className="w-full h-32 object-contain mb-3 bg-gray-50 rounded-lg"
+                  className="w-full h-52 object-cover"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src =
+                    (
+                      e.target as HTMLImageElement
+                    ).src =
                       "https://placehold.co/600x400?text=No+Image";
                   }}
                 />
 
-                <h3 className="font-medium text-gray-800 line-clamp-2">
+                <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full shadow font-bold text-blue-600">
+                  ৳ {item.price}
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-4">
+                <h3 className="font-semibold text-lg text-gray-800 line-clamp-2 min-h-[56px]">
                   {item.title}
                 </h3>
 
-                <p className="text-xs text-gray-400 mt-1 uppercase tracking-wider bg-gray-100 w-max px-2 py-0.5 rounded">
-                  {item.condition}
-                </p>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mt-4 text-sm">
-                  <span className="text-blue-600 font-semibold">
-                    {item.price} tk
+                <div className="mt-2">
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full font-medium ${
+                      item.condition === "New"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {item.condition}
                   </span>
                 </div>
 
-                <div className="mt-3 flex gap-2">
+                <p className="text-sm text-gray-500 mt-3 line-clamp-3 min-h-[60px]">
+                  {item.description}
+                </p>
+
+                {/* Actions */}
+                <div className="flex gap-2 mt-5">
                   <Link
-                    to={String(item.id)}
-                    className="flex-1 py-2 text-center text-sm bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium"
+                    to={`${item.id}`}
+                    className="flex-1 text-center py-2 border rounded-lg hover:bg-gray-50 transition"
                   >
-                    View Details
+                    View
                   </Link>
 
                   <button
-                    onClick={() => handleDelete(item.id)}
-                    className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-                  >
-                    Delete
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigate(`/sellpage/update/${item.id}`);
-                    }}
-                    className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                    onClick={() =>
+                      navigate(
+                        `/sellpage/update/${item.id}`
+                      )
+                    }
+                    className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                   >
                     Edit
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      handleDelete(item.id)
+                    }
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                  >
+                    Delete
                   </button>
                 </div>
               </div>

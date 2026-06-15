@@ -1,24 +1,25 @@
 // components/SideNavBar.jsx
-import { Outlet } from "react-router";
+import { Outlet, NavLink } from "react-router";
 import {
   FaHome,
+  FaBoxes,
   FaBook,
   FaPencilAlt,
-  FaSearch,
   FaCrown,
   FaBars,
   FaCalculator,
 } from "react-icons/fa";
-import { NavLink } from "react-router";
 
 const menuItems = [
   { icon: FaHome, label: "Home", path: "/dashboard/home" },
-  {icon: FaHome, label: "All Items", path :"/dashboard/all-items" },
+  { icon: FaBoxes, label: "All Items", path: "/dashboard/all-items" },
   { icon: FaBook, label: "Books", path: "books" },
   { icon: FaPencilAlt, label: "Stationary", path: "stationary" },
   { icon: FaCalculator, label: "Calculator", path: "calculator" },
-  { icon: FaCrown, label: "Subscriptions", path: "subscriptions" },
+  { icon: FaCrown, label: "Subscriptions", path: "subscriptions" }, // FaCrown is great for premium/subs. FaSync is a good alternative for recurring subs!
 ];
+
+// ... rest of your component
 
 const SideNavBar = () => {
   return (

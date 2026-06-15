@@ -5,34 +5,18 @@ import {
   FaList,
   FaBook,
   FaPencilAlt,
-  FaSearch,
   FaCrown,
 } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router";
 
 const sellMenuItems = [
   { icon: FaTag, label: "Sell New Item", path: "sell-item-form" },
-  { icon: FaBook, label: "Books", path: "books" },
-  { icon: FaPencilAlt, label: "Stationary", path: "stationary" },
+  { icon: FaBook, label: "My Books", path: "books" },
+  { icon: FaPencilAlt, label: "My Stationaries", path: "stationary" },
   { icon: FaCrown, label: "Subscription", path: "subscriptions" },
 ];
 
 const SellPageSideNavbar = () => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    // Add your logout logic here
-    // Examples:
-    // - Clear localStorage/sessionStorage
-    // - Clear authentication context
-    // - Call logout API
-
-    localStorage.removeItem("token"); // Example
-    sessionStorage.clear(); // Example
-
-    navigate("/login"); // Redirect to login page
-  };
-
   return (
     <div className="drawer lg:drawer-open">
       <input id="main-drawer" type="checkbox" className="drawer-toggle" />
@@ -44,7 +28,7 @@ const SellPageSideNavbar = () => {
           htmlFor="main-drawer"
           className="btn btn-ghost drawer-button lg:hidden m-2 text-base"
         >
-          <FaList className="mr-2 text-base" /> Sell Menu
+          <FaList className="mr-2 text-base" />
         </label>
 
         {/* Page Content */}

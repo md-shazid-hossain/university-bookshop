@@ -1,44 +1,36 @@
-import { useState, useEffect } from "react"; // 1. Import hooks
-import axios from "axios"; // 2. Import axios
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Link } from "react-router";
 
+type Item = {
+  id: number;
+  title: string;
+  price: number | string;
+  condition: string;
+  description: string;
+  imageUrl: string;
+  category: string;
+};
+
 const Home: React.FC = () => {
-  // Adjusted Type definitions to match your backend Item schema
-  type Item = {
-    id: number;
-    title: string;
-    price: number | string; // Keeps flexibility depending on how decimal maps
-    condition: string;
-    description: string;
-    imageUrl: string; // Matched database column name
-    category: string;
-  };
-
   const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  console.log(items);
 
-
-
-  const allitems = items.slice(0, 4);
-
-  // 3. Fetch data inside useEffect on component mount
   useEffect(() => {
     const fetchItems = async () => {
       try {
         setLoading(true);
-        // Replace with your production URL if necessary
-        const response = await axios.get("http://localhost:3000/items");
 
-        // Filter for "Books" category if you want this page to only show books
-        const allItems: Item[] = response.data;
+        const { data } = await axios.get(
+          "http://localhost:3000/items"
+        );
 
-        setItems(allItems);
+        setItems(data);
         setError(null);
-      } catch (err: any) {
-        console.error("Error fetching items:", err);
-        setError("Failed to load products. Please try again later.");
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load items.");
       } finally {
         setLoading(false);
       }
@@ -47,22 +39,22 @@ const Home: React.FC = () => {
     fetchItems();
   }, []);
 
-  // Handle Loading State
+  const featuredItems = items.slice(0, 4);
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="text-xl font-medium text-gray-600 animate-pulse">
-          Loading items...
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="text-lg font-medium text-gray-500 animate-pulse">
+          Loading marketplace...
         </div>
       </div>
     );
   }
 
-  // Handle Error State
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="text-red-500 font-medium bg-red-50 px-4 py-2 rounded-lg border border-red-200">
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl">
           {error}
         </div>
       </div>
@@ -71,98 +63,138 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="max-w-8xl mx-auto px-4 pt-8">
-        <div className="bg-gradient-to-r from-indigo-100 to-purple-100 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between shadow-sm">
-          {/* Left Content */}
+      {/* HERO */}
+      <div className="max-w-7xl mx-auto px-4 pt-10">
+        <div className="bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100 rounded-3xl p-10 flex flex-col md:flex-row items-center justify-between shadow-sm">
           <div className="max-w-xl">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 leading-snug">
-              Everything students need, <br />
-              from students like you.
+            <h1 className="text-4xl font-bold text-gray-900 leading-snug">
+              Buy & Sell Everything You Need 📚✏️
             </h1>
-            <p className="mt-4 text-gray-600">
-              Buy, sell and share books, stationery and subscriptions.
+
+            <p className="mt-4 text-gray-600 text-lg">
+              A student marketplace for books, stationery and more.
             </p>
 
-            {/* <button className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-              Explore Now
-            </button> */}
+            <div className="mt-6 flex gap-3">
+              <Link
+                to="/dashboard/all-items"
+                className="px-5 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition"
+              >
+                Explore Items
+              </Link>
+
+              <Link
+                to="/sellpage/sell-item-form"
+                className="px-5 py-3 border rounded-xl hover:bg-white transition"
+              >
+                Start Selling
+              </Link>
+            </div>
           </div>
 
-          {/* Right Image */}
-          <div className="mt-6 md:mt-0">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png"
-              alt="student"
-              className="w-64"
-            />
-          </div>
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png"
+            className="w-60 mt-6 md:mt-0"
+          />
         </div>
       </div>
 
-      {/* Popular Items */}
-      <div className="max-w-8xl mx-auto px-4 mt-10">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-800">Popular Items</h2>
-          <button className="text-indigo-600 hover:underline"><Link to='/dashboard/all-items'>View All</Link></button>
+      {/* FEATURE STRIP */}
+      <div className="max-w-7xl mx-auto px-4 mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white border rounded-xl p-5 text-center">
+          <p className="text-2xl font-bold text-indigo-600">
+            {items.length}
+          </p>
+          <p className="text-gray-500">Total Listings</p>
         </div>
 
-        {/* Grid */}
-        <div>
-          {/* Grid handling empty state */}
-          {allitems.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              No items available right now.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              {allitems.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition flex flex-col justify-between"
-                >
-                  <div>
-                    <img
-                      src="https://i.ibb.co.com/chmc3g62/428639.jpg" // Updated to use imageUrl
-                      alt={item.title}
-                      className="w-full h-32 object-contain mb-3 bg-gray-50 rounded-lg"
-                      onError={(e) => {
-                        // Fallback placeholder image if a broken URL is fed from DB
-                        (e.target as HTMLImageElement).src =
-                          "https://placehold.co/600x400?text=No+Image";
-                      }}
-                    />
+        <div className="bg-white border rounded-xl p-5 text-center">
+          <p className="text-2xl font-bold text-indigo-600">
+            Books
+          </p>
+          <p className="text-gray-500">Top Category</p>
+        </div>
 
-                    <h3 className="font-medium text-gray-800 line-clamp-2">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs text-gray-400 mt-1 uppercase tracking-wider bg-gray-100 w-max px-2 py-0.5 rounded">
-                      {item.condition}
-                    </p>
+        <div className="bg-white border rounded-xl p-5 text-center">
+          <p className="text-2xl font-bold text-indigo-600">
+            Fast
+          </p>
+          <p className="text-gray-500">Simple Selling</p>
+        </div>
+      </div>
+
+      {/* POPULAR ITEMS */}
+      <div className="max-w-7xl mx-auto px-4 mt-12">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">
+            🔥 Popular Items
+          </h2>
+
+          <Link
+            to="/dashboard/all-items"
+            className="text-indigo-600 hover:underline"
+          >
+            View All
+          </Link>
+        </div>
+
+        {featuredItems.length === 0 ? (
+          <div className="text-center py-16 text-gray-500">
+            No items available right now.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {featuredItems.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white border rounded-2xl overflow-hidden hover:shadow-lg transition"
+              >
+                {/* Image */}
+                <div className="relative">
+                  <img
+                    src={
+                      item.imageUrl ||
+                      "https://placehold.co/600x400?text=Item"
+                    }
+                    alt={item.title}
+                    className="w-full h-48 object-cover"
+                    onError={(e) => {
+                      (
+                        e.target as HTMLImageElement
+                      ).src =
+                        "https://placehold.co/600x400?text=No+Image";
+                    }}
+                  />
+
+                  <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full shadow text-indigo-600 font-bold">
+                    ৳ {item.price}
                   </div>
+                </div>
 
-                  <div>
-                    <div className="flex justify-between items-center mt-4 text-sm">
-                      <span className="text-blue-600 font-semibold">
-                        {item.price} tk
-                      </span>
-                    </div>
+                {/* Content */}
+                <div className="p-4">
+                  <h3 className="font-semibold text-lg line-clamp-2 min-h-[56px]">
+                    {item.title}
+                  </h3>
 
+                  <span className="text-xs px-3 py-1 bg-gray-100 rounded-full text-gray-600">
+                    {item.condition}
+                  </span>
+
+                  <div className="mt-4">
                     <Link
-                      to={String(item.id)}
-                      className="mt-3 w-full py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium"
+                      to={`${item.id}`}
+                      className="block text-center py-2 border rounded-lg hover:bg-gray-50"
                     >
                       View Details
                     </Link>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-
-      {/* Subscription Groups Section */}
     </div>
   );
 };

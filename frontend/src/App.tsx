@@ -62,6 +62,22 @@ const router = createBrowserRouter([
           { path: "calculator", element: <Calculator /> },
           { path: "books", element: <AllBooksPage /> },
           { path: "subscriptions", element: <Subscription /> },
+          {
+            path: "all-items/:id",
+            element: <ProductDetail />,
+          },
+          {
+            path: "books/:id",
+            element: <ProductDetail />,
+          },
+          {
+            path: "stationary/:id",
+            element: <ProductDetail />,
+          },
+          {
+            path: "home/:id",
+            element: <ProductDetail />,
+          },
         ],
       },
       {
@@ -74,13 +90,18 @@ const router = createBrowserRouter([
         children: [
           { path: "sell-item-form", element: <SellItemForm /> },
           { path: "books", element: <BooksPage /> },
+
+          { path: "stationary", element: <StationaryPage /> },
+          { path: "subscriptions", element: <Subscription /> },
+          { path: "update/:id", element: <UpdateItemForm /> },
           {
             path: "books/:id",
             element: <ProductDetail />,
           },
-          { path: "stationary", element: <StationaryPage /> },
-          { path: "subscriptions", element: <Subscription /> },
-          { path: "/sellpage/update/:id", element: <UpdateItemForm /> },
+          {
+            path: "stationary/:id",
+            element: <ProductDetail />,
+          },
         ],
       },
     ],

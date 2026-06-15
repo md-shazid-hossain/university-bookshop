@@ -26,8 +26,7 @@ const Login = () => {
         // Example: store token/user
         localStorage.setItem("user", JSON.stringify(res.data.user));
 
-        alert("Login successful!");
-        navigate('/sellpage/books')
+        navigate("/sellpage/books");
       } else {
         setError(res.data.message || "Login failed");
       }
@@ -35,6 +34,7 @@ const Login = () => {
       setError(
         err.response?.data?.message || "Something went wrong. Try again.",
       );
+      alert(err);
       console.log(err);
     } finally {
       setLoading(false);
@@ -88,10 +88,9 @@ const Login = () => {
         <button
           type="submit"
           disabled={loading}
-          
           className="w-full rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
         >
-          {loading ? "Logging in..." : "Login"} 
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
     </div>
