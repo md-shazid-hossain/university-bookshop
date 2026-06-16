@@ -68,7 +68,7 @@ const Home: React.FC = () => {
         <div className="bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100 rounded-3xl p-10 flex flex-col md:flex-row items-center justify-between shadow-sm">
           <div className="max-w-xl">
             <h1 className="text-4xl font-bold text-gray-900 leading-snug">
-              Buy & Sell Everything You Need 📚✏️
+              Buy & Sell Everything You Need
             </h1>
 
             <p className="mt-4 text-gray-600 text-lg">
@@ -127,7 +127,7 @@ const Home: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 mt-12">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
-            🔥 Popular Items
+            Popular Items
           </h2>
 
           <Link

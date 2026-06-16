@@ -16,6 +16,7 @@ import AllBooksPage from "./pages/AllBooksPage";
 import AllStationaryPage from "./pages/AllStationaryPage";
 import AllItems from "./pages/AllItems";
 import UpdateItemForm from "./pages/UpdateItemForm";
+import SubscriptionUser from "./pages/SubscriptionUser";
 
 // Main Layout Component
 function Layout() {
@@ -61,7 +62,7 @@ const router = createBrowserRouter([
           { path: "all-items", element: <AllItems /> },
           { path: "calculator", element: <Calculator /> },
           { path: "books", element: <AllBooksPage /> },
-          { path: "subscriptions", element: <Subscription /> },
+          { path: "subscriptions", element: <SubscriptionUser /> },
           {
             path: "all-items/:id",
             element: <ProductDetail />,

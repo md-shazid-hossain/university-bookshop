@@ -13,7 +13,7 @@ const sellMenuItems = [
   { icon: FaTag, label: "Sell New Item", path: "sell-item-form" },
   { icon: FaBook, label: "My Books", path: "books" },
   { icon: FaPencilAlt, label: "My Stationaries", path: "stationary" },
-  { icon: FaCrown, label: "Subscription", path: "subscriptions" },
+  { icon: FaCrown, label: "My Subscription", path: "subscriptions" },
 ];
 
 const SellPageSideNavbar = () => {

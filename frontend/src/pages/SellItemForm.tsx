@@ -37,12 +37,10 @@ const SellItemForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const categories = ["Books", "Stationary"];
-  const conditions = ["New", "Like New", "Good", "Fair", "Used"];
+  const conditions = ["New", "Like New", "Good", "Used"];
 
   const handleChange = (
-    e: ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -88,10 +86,7 @@ const SellItemForm = () => {
     setIsSubmitting(true);
 
     try {
-      await axios.post(
-        "http://localhost:3000/items",
-        formData
-      );
+      await axios.post("http://localhost:3000/items", formData);
 
       alert("Item posted successfully 🎉");
 
@@ -112,10 +107,7 @@ const SellItemForm = () => {
         userId: user?.id || 0,
       });
     } catch (err: any) {
-      alert(
-        err?.response?.data?.error ||
-          "Something went wrong"
-      );
+      alert(err?.response?.data?.error || "Something went wrong");
     } finally {
       setIsSubmitting(false);
     }
@@ -125,9 +117,7 @@ const SellItemForm = () => {
     <div className="max-w-6xl mx-auto px-4 py-10">
       {/* Header */}
       <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold text-gray-900">
-          Sell Your Item
-        </h1>
+        <h1 className="text-4xl font-bold text-gray-900">Sell Your Item</h1>
         <p className="text-gray-500 mt-2">
           Fill in the details and start selling instantly
         </p>
@@ -143,9 +133,7 @@ const SellItemForm = () => {
           <div className="space-y-5">
             {/* Image URL */}
             <div>
-              <label className="font-medium text-gray-700">
-                Image URL
-              </label>
+              <label className="font-medium text-gray-700">Image URL</label>
 
               <input
                 type="url"
@@ -157,9 +145,7 @@ const SellItemForm = () => {
               />
 
               {errors.imageUrl && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.imageUrl}
-                </p>
+                <p className="text-red-500 text-sm mt-1">{errors.imageUrl}</p>
               )}
             </div>
 
@@ -171,14 +157,12 @@ const SellItemForm = () => {
                   alt="preview"
                   className="w-full h-full object-contain"
                   onError={(e) =>
-                    (e.target as HTMLImageElement).src =
-                      "https://placehold.co/600x400?text=Invalid+Image"
+                    ((e.target as HTMLImageElement).src =
+                      "https://placehold.co/600x400?text=Invalid+Image")
                   }
                 />
               ) : (
-                <p className="text-gray-400">
-                  Image preview will appear here
-                </p>
+                <p className="text-gray-400">Image preview will appear here</p>
               )}
             </div>
           </div>
@@ -195,9 +179,7 @@ const SellItemForm = () => {
                 className="w-full border rounded-lg px-4 py-2"
               />
               {errors.title && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.title}
-                </p>
+                <p className="text-red-500 text-sm mt-1">{errors.title}</p>
               )}
             </div>
 
@@ -216,9 +198,7 @@ const SellItemForm = () => {
                   ))}
                 </select>
                 {errors.category && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.category}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.category}</p>
                 )}
               </div>
 
@@ -231,9 +211,7 @@ const SellItemForm = () => {
                   className="w-full border rounded-lg px-3 py-2"
                 />
                 {errors.price && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.price}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.price}</p>
                 )}
               </div>
             </div>
@@ -252,9 +230,7 @@ const SellItemForm = () => {
                 ))}
               </select>
               {errors.condition && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.condition}
-                </p>
+                <p className="text-red-500 text-sm mt-1">{errors.condition}</p>
               )}
             </div>
 
@@ -289,9 +265,7 @@ const SellItemForm = () => {
               type="submit"
               disabled={isSubmitting}
               className={`w-full py-3 rounded-xl text-white font-semibold ${
-                isSubmitting
-                  ? "bg-gray-400"
-                  : "bg-blue-600 hover:bg-blue-700"
+                isSubmitting ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
               }`}
             >
               {isSubmitting ? "Posting..." : "Post Item"}

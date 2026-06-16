@@ -46,8 +46,6 @@ const Subscription = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-
-
   },
   {
     timestamps: true,

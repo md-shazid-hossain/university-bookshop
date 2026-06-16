@@ -59,7 +59,7 @@ const UpdateItemForm = () => {
   }, [id]);
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -108,23 +108,22 @@ const UpdateItemForm = () => {
     } catch (err: any) {
       console.error(err);
       alert(err.response?.data?.error || "Update failed");
+  
     } finally {
+          navigate(-1);
       setIsSubmitting(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="bg-gray-100 py-12 px-4 text-center">
-        Loading item...
-      </div>
+      <div className="bg-gray-100 py-12 px-4 text-center">Loading item...</div>
     );
   }
 
   return (
     <div className="bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
@@ -141,12 +140,9 @@ const UpdateItemForm = () => {
           className="bg-white rounded-2xl overflow-hidden shadow-sm"
         >
           <div className="p-6 md:p-8">
-
             <div className="flex flex-col lg:flex-row gap-8">
-
               {/* LEFT COLUMN */}
               <div className="lg:w-1/2 flex flex-col justify-between">
-
                 {/* Image URL */}
                 <div className="space-y-4">
                   <div>
@@ -196,7 +192,6 @@ const UpdateItemForm = () => {
 
               {/* RIGHT COLUMN */}
               <div className="lg:w-1/2 space-y-6">
-
                 {/* Title */}
                 <div>
                   <label className="text-sm font-semibold text-gray-700">
@@ -216,7 +211,6 @@ const UpdateItemForm = () => {
 
                 {/* Category + Price */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
                   <div>
                     <label className="text-sm font-semibold">Category</label>
                     <select
@@ -319,20 +313,18 @@ const UpdateItemForm = () => {
                   type="submit"
                   disabled={isSubmitting}
                   className={`w-full text-white font-semibold py-3 rounded-xl
-                  ${isSubmitting
-                    ? "bg-gray-400"
-                    : "bg-gradient-to-r from-blue-600 to-blue-700"
+                  ${
+                    isSubmitting
+                      ? "bg-gray-400"
+                      : "bg-gradient-to-r from-blue-600 to-blue-700"
                   }`}
                 >
                   {isSubmitting ? "Updating..." : "Update Item"}
                 </button>
-
               </div>
             </div>
-
           </div>
         </form>
-
       </div>
     </div>
   );

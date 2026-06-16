@@ -25,8 +25,8 @@ const Login = () => {
 
         // Example: store token/user
         localStorage.setItem("user", JSON.stringify(res.data.user));
-
-        navigate("/sellpage/books");
+        alert("Login Successful!")
+        navigate("/dashboard/home");
       } else {
         setError(res.data.message || "Login failed");
       }

@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
 import axios from "axios";
-import { MessageSquare, Phone, ArrowLeft, ShieldCheck, Tag, Info } from "lucide-react";
+import {
+  MessageSquare,
+  Phone,
+  ArrowLeft,
+  ShieldCheck,
+  Tag,
+  Info,
+} from "lucide-react";
 
 interface ItemDetail {
   id: number;
@@ -47,7 +54,9 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[500px]">
-        <div className="text-xl font-medium text-gray-600 animate-pulse">Loading item details...</div>
+        <div className="text-xl font-medium text-gray-600 animate-pulse">
+          Loading item details...
+        </div>
       </div>
     );
   }
@@ -58,8 +67,8 @@ const ProductDetail = () => {
         <div className="text-red-500 font-medium bg-red-50 p-6 rounded-xl border border-red-200 inline-block">
           {error || "Item not found."}
         </div>
-        <button 
-          onClick={() => navigate(-1)} 
+        <button
+          onClick={() => navigate(-1)}
           className="mt-4 block mx-auto text-blue-600 hover:underline flex items-center gap-1 justify-center"
         >
           <ArrowLeft className="w-4 h-4" /> Go Back
@@ -71,7 +80,6 @@ const ProductDetail = () => {
   return (
     <div className="bg-gray-50 min-h-screen py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        
         {/* Back Navigation */}
         <button
           onClick={() => navigate(-1)}
@@ -83,7 +91,6 @@ const ProductDetail = () => {
 
         {/* Product Layout Card */}
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 p-6 md:p-8">
-          
           {/* Left Column: Image Box */}
           <div className="flex items-center justify-center bg-gray-50 rounded-xl overflow-hidden p-4 border border-gray-200 min-h-[350px] max-h-[500px]">
             <img
@@ -91,7 +98,8 @@ const ProductDetail = () => {
               alt={item.title}
               className="w-full h-full object-contain max-h-[450px]"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = "https://placehold.co/600x400?text=No+Image+Available";
+                (e.target as HTMLImageElement).src =
+                  "https://placehold.co/600x400?text=No+Image+Available";
               }}
             />
           </div>
@@ -105,25 +113,46 @@ const ProductDetail = () => {
               </span>
 
               {/* Title */}
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{item.title}</h1>
-              
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                {item.title}
+              </h1>
+
               {/* Price */}
-              <p className="text-4xl font-extrabold text-blue-600 mb-4">{item.price} <span className="text-lg font-medium text-gray-500">tk</span></p>
+              <p className="text-4xl font-extrabold text-blue-600 mb-4">
+                {item.price}{" "}
+                <span className="text-lg font-medium text-gray-500">tk</span>
+              </p>
 
               <hr className="border-gray-100 my-4" />
 
               {/* Core Details Info */}
               <div className="space-y-3">
                 <div className="flex items-center text-sm text-gray-700">
-                  <span className="w-28 font-medium text-gray-500">Condition:</span>
+                  <span className="w-28 font-medium text-gray-500">
+                    Condition:
+                  </span>
                   <span className="px-2.5 py-0.5 bg-green-50 text-green-700 font-semibold rounded-md text-xs border border-green-200">
                     {item.condition}
                   </span>
                 </div>
                 <div className="flex items-center text-sm text-gray-700">
-                  <span className="w-28 font-medium text-gray-500">Posted on:</span>
+                  <span className="w-28 font-medium text-gray-500">
+                    Posted on:
+                  </span>
                   <span className="text-gray-900 font-medium">
-                    {new Date(item.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                    {new Date(item.createdAt).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
+                <div className="flex items-center text-sm text-gray-700">
+                  <span className="w-28 font-medium text-gray-500">
+                    Phone Number:
+                  </span>
+                  <span className="px-2.5 py-0.5 bg-green-50 text-green-700 font-semibold rounded-md text-xs border border-green-200">
+                    {item.phoneNumber}
                   </span>
                 </div>
               </div>
@@ -141,7 +170,6 @@ const ProductDetail = () => {
 
             {/* Action Buttons Section */}
             <div className="pt-6 border-t border-gray-100 space-y-3">
-              
               {/* Conditional Action based on Database Option */}
               {item.contactOption === "show-phone" && item.phoneNumber ? (
                 <div>
@@ -174,16 +202,16 @@ const ProductDetail = () => {
               <div className="flex items-start gap-2 text-xs text-gray-400 bg-amber-50/60 p-3 rounded-lg border border-amber-100/50 mt-4">
                 <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <p>
-                  <span className="font-semibold text-amber-800">Safety Tip:</span> Avoid paying advance amounts before inspecting the item in person. Meet in a secure public location.
+                  <span className="font-semibold text-amber-800">
+                    Safety Tip:
+                  </span>{" "}
+                  Avoid paying advance amounts before inspecting the item in
+                  person. Meet in a secure public location.
                 </p>
               </div>
-
             </div>
-
           </div>
-
         </div>
-
       </div>
     </div>
   );
