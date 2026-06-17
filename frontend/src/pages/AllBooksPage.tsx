@@ -183,6 +183,7 @@ const AllBooksPage = () => {
                   to={`${item.id}`}
                   className="block mt-5 text-center py-2 border rounded-lg hover:bg-gray-50 transition"
                 >
+                  
                   View Details
                 </Link>
               </div>
