@@ -60,3 +60,5 @@ Subscription.associate = function (models) {
 };
 
 module.exports = Subscription;
+//Completed the subscription part.
+//checking everything is up to date.
