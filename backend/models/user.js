@@ -25,3 +25,6 @@ User.associate = function (models) {
 };
 
 module.exports = User;
+//completed the user part.
+
+//checdking everything is up to date.
