@@ -63,3 +63,4 @@ Item.associate = function (models) {
 };
 
 module.exports = Item;
+//added item part.
