@@ -13,6 +13,7 @@ type Item = {
   userId?: number;
 };
 
+
 const StationaryPage = () => {
   const navigate = useNavigate();
 
@@ -120,6 +121,7 @@ const StationaryPage = () => {
           + Add Item
         </button>
       </div>
+      
 
       {/* Stats + Search */}
       <div className="grid md:grid-cols-[220px_1fr] gap-4 mb-8">
@@ -243,6 +245,7 @@ const StationaryPage = () => {
                     className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
                   >
                     Delete
+                    
                   </button>
                 </div>
               </div>
