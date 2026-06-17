@@ -23,6 +23,7 @@ const BooksPage = () => {
 
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
+  
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -42,6 +43,7 @@ const BooksPage = () => {
         setLoading(false);
       }
     };
+    
 
     fetchItems();
   }, []);
@@ -242,6 +244,7 @@ const BooksPage = () => {
                     className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
                   >
                     Delete
+                    
                   </button>
                 </div>
               </div>
